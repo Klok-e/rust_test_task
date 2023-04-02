@@ -1,1 +1,1 @@
-pub fn configure(_provider: &str) {}
+pub async fn configure(_provider: &str) {}
