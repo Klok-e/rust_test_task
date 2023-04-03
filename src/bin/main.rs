@@ -12,7 +12,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let cli = Cli::parse();
 
     let Some(proj_dirs) = ProjectDirs::from("com", "MyOrg",  "Weather") else {
-        bail!("ERROR: Couldn't access user config directory.");
+        bail!("couldn't access user config directory.");
     };
 
     let config = proj_dirs.config_dir();
