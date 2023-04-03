@@ -2,10 +2,11 @@ use std::path::Path;
 
 use crate::{error::Result, providers::ProviderUserInfo};
 
-pub async fn get_weather(_address: &str, _date: &str, config_file: &Path) -> Result<()> {
+pub async fn get_weather(address: &str, _date: &str, config_file: &Path) -> Result<()> {
     let weather_api = ProviderUserInfo::from_file(config_file)?.build_provider();
-    let weather = weather_api.get_weather(49.987_503, 36.285_374).await?;
+    let weather = weather_api.get_weather_city(address).await?;
 
+    println!("{}", weather.location);
     println!("{}", weather.description);
     println!("{:+} °C", weather.temperature);
 

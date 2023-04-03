@@ -28,6 +28,12 @@ impl OpenWeather {
         let response = self.client.get(&addr).send().await?.error_for_status()?;
         Ok(response.json().await?)
     }
+
+    pub async fn current_weather_city(&self, city: &str) -> Result<CurrentWeather> {
+        let addr = self.format_addr(&format!("weather?q={city}"));
+        let response = self.client.get(&addr).send().await?.error_for_status()?;
+        Ok(response.json().await?)
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -78,9 +84,9 @@ pub struct Main {
     pub pressure: i64,
     pub humidity: i64,
     #[serde(rename = "sea_level")]
-    pub sea_level: i64,
+    pub sea_level: Option<i64>,
     #[serde(rename = "grnd_level")]
-    pub grnd_level: i64,
+    pub grnd_level: Option<i64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -88,7 +94,7 @@ pub struct Main {
 pub struct Wind {
     pub speed: f64,
     pub deg: i64,
-    pub gust: f64,
+    pub gust: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
