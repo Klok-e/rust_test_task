@@ -9,8 +9,6 @@ pub enum Error {
     File(#[from] std::io::Error),
     #[error("serialization error")]
     Serialization(#[from] serde_json::Error),
-    #[error("prompt error")]
-    Prompt(#[from] inquire::error::InquireError),
     #[error("date time parse error")]
     DateTimeParse(#[from] chrono::ParseError),
     #[error("invalid timezone time error")]

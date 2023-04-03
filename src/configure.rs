@@ -25,19 +25,23 @@ pub async fn configure(provider: &Provider, config_file: &Path) -> Result<()> {
 }
 
 fn openweather(config_file: &Path) -> Result<()> {
-    let key = inquire::Password::new("OpenWeather api key:")
-        .without_confirmation()
-        .prompt()?;
-    let serialized = serde_json::to_string(&ProviderUserInfo::OpenWeather { api_key: key })?;
+    println!("OpenWeather api key:");
+    let mut str = String::new();
+    std::io::stdin().read_line(&mut str)?;
+    let serialized = serde_json::to_string(&ProviderUserInfo::OpenWeather {
+        api_key: str.trim().to_owned(),
+    })?;
     std::fs::write(config_file, serialized)?;
     Ok(())
 }
 
 fn weatherapi(config_file: &Path) -> Result<()> {
-    let key = inquire::Password::new("Weather API api key:")
-        .without_confirmation()
-        .prompt()?;
-    let serialized = serde_json::to_string(&ProviderUserInfo::WeatherApi { api_key: key })?;
+    println!("Weather API api key:");
+    let mut str = String::new();
+    std::io::stdin().read_line(&mut str)?;
+    let serialized = serde_json::to_string(&ProviderUserInfo::WeatherApi {
+        api_key: str.trim().to_owned(),
+    })?;
     std::fs::write(config_file, serialized)?;
     Ok(())
 }
