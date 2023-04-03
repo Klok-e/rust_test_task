@@ -38,9 +38,9 @@ impl ProviderUserInfo {
     }
 
     /// Creates a `ProviderUserInfo` from a JSON file.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if the file cannot be read or deserialized.
     pub fn from_file(file: &Path) -> Result<Self> {
         Ok(serde_json::from_reader(std::fs::File::open(file)?)?)
