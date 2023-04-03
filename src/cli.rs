@@ -1,4 +1,4 @@
-use clap::{command, Parser, Subcommand};
+use clap::{command, Parser, Subcommand, ValueEnum};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -17,5 +17,11 @@ pub enum Commands {
         date: String,
     },
     /// Configure provider
-    Configure { provider: String },
+    Configure { provider: Provider },
+}
+
+#[derive(Clone, Copy, ValueEnum)]
+pub enum Provider {
+    OpenWeather,
+    WeatherApi,
 }

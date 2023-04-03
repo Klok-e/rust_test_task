@@ -25,7 +25,7 @@ impl OpenWeather {
 
     pub async fn current_weather(&self, lat: f32, lon: f32) -> Result<CurrentWeather> {
         let addr = self.format_addr(&format!("weather?lat={lat}&lon={lon}"));
-        let response = self.client.get(&addr).send().await?;
+        let response = self.client.get(&addr).send().await?.error_for_status()?;
         Ok(response.json().await?)
     }
 }

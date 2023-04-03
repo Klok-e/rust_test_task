@@ -1,8 +1,12 @@
 mod openweather;
-use self::openweather::OpenWeather;
+use std::path::Path;
+
 use crate::error::Result;
 use async_trait::async_trait;
+use openweather::OpenWeather;
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Serialize, Deserialize)]
 pub enum ProviderUserInfo {
     OpenWeather { api_key: String },
     WeatherApi,
@@ -16,8 +20,8 @@ impl ProviderUserInfo {
         }
     }
 
-    pub fn from_file(_file: &str) -> Self {
-        todo!()
+    pub fn from_file(file: &Path) -> Result<Self> {
+        Ok(serde_json::from_reader(std::fs::File::open(file)?)?)
     }
 }
 

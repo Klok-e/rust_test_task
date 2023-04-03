@@ -1,10 +1,9 @@
+use std::path::Path;
+
 use crate::{error::Result, providers::ProviderUserInfo};
 
-pub async fn get_weather(_address: &str, _date: &str) -> Result<()> {
-    let weather_api = ProviderUserInfo::OpenWeather {
-        api_key: "5c37dd4ce498db4bc0b7f7c04b39c0f7".into(),
-    }
-    .build_provider();
+pub async fn get_weather(_address: &str, _date: &str, config_file: &Path) -> Result<()> {
+    let weather_api = ProviderUserInfo::from_file(config_file)?.build_provider();
     let weather = weather_api.get_weather(49.987_503, 36.285_374).await?;
 
     println!("{}", weather.description);

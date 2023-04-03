@@ -1,18 +1,30 @@
+use anyhow::bail;
 use clap::Parser;
-use weather_lib::cli::Cli;
-use weather_lib::error::Result;
-use weather_lib::{cli::Commands, configure::configure, get::get_weather};
+use directories::ProjectDirs;
+use weather_lib::{
+    cli::{Cli, Commands},
+    configure::configure,
+    get::get_weather,
+};
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), anyhow::Error> {
     let cli = Cli::parse();
+
+    let Some(proj_dirs) = ProjectDirs::from("com", "MyOrg",  "Weather") else {
+        bail!("ERROR: Couldn't access user config directory.");
+    };
+
+    let config = proj_dirs.config_dir();
+    std::fs::create_dir_all(config)?;
+    let config_file = config.join("config.json");
 
     match &cli.command {
         Commands::Configure { provider } => {
-            configure(provider).await;
+            configure(provider, &config_file).await?;
         }
         Commands::Get { address, date } => {
-            get_weather(address, date).await?;
+            get_weather(address, date, &config_file).await?;
         }
     }
 
