@@ -10,6 +10,12 @@ pub enum Error {
     Serialization(#[from] serde_json::Error),
     #[error("prompt error")]
     Prompt(#[from] inquire::error::InquireError),
+    #[error("date time parse error")]
+    DateTimeParse(#[from] chrono::ParseError),
+    #[error("invalid timezone time error")]
+    InvalidTimezoneTime,
+    #[error("no weather history error")]
+    WeatherNoHistory,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

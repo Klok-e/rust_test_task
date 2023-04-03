@@ -1,12 +1,11 @@
 mod openweather;
-use std::path::Path;
 
-use crate::error::Result;
+use self::openweather::{CurrentWeather, OpenWeather};
+use crate::error::{Error, Result};
 use async_trait::async_trait;
-use openweather::OpenWeather;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-use self::openweather::CurrentWeather;
+use std::path::Path;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ProviderUserInfo {
@@ -29,23 +28,29 @@ impl ProviderUserInfo {
 
 #[async_trait]
 pub trait WeatherProvider {
-    async fn get_weather(&self, lat: f32, lon: f32) -> Result<Weather>;
     async fn get_weather_city(&self, city: &str) -> Result<Weather>;
+    async fn get_history_weather_city(&self, city: &str, date: DateTime<Utc>) -> Result<Weather>;
 }
 
 #[async_trait]
 impl WeatherProvider for OpenWeather {
-    async fn get_weather(&self, lat: f32, lon: f32) -> Result<Weather> {
-        let w = self.current_weather(lat, lon).await?;
-        Ok(extract_weather_data(w))
-    }
     async fn get_weather_city(&self, city: &str) -> Result<Weather> {
         let w = self.current_weather_city(city).await?;
-        Ok(extract_weather_data(w))
+        Ok(open_weather_extract_weather_data(w))
+    }
+
+    async fn get_history_weather_city(&self, city: &str, date: DateTime<Utc>) -> Result<Weather> {
+        let weather = self.history_weather(city, date).await?;
+        let ok_or = weather
+            .list
+            .into_iter()
+            .next()
+            .ok_or(Error::WeatherNoHistory)?;
+        Ok(open_weather_extract_weather_data(ok_or))
     }
 }
 
-fn extract_weather_data(w: CurrentWeather) -> Weather {
+fn open_weather_extract_weather_data(w: CurrentWeather) -> Weather {
     Weather {
         cloudiness: w.clouds.all,
         rain_volume: w.rain.and_then(|x| x.n1h).unwrap_or(0.),

@@ -1,4 +1,5 @@
 use crate::error::Result;
+use chrono::{DateTime, Utc};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -23,8 +24,16 @@ impl OpenWeather {
         )
     }
 
-    pub async fn current_weather(&self, lat: f32, lon: f32) -> Result<CurrentWeather> {
-        let addr = self.format_addr(&format!("weather?lat={lat}&lon={lon}"));
+    fn format_addr_history(&self, query: &str) -> String {
+        const BASE_HTTP: &str = "https://history.openweathermap.org/data/2.5/";
+        format!("{}{}&appid={}&type=hour", &BASE_HTTP, &query, self.api_key)
+    }
+
+    pub async fn history_weather(&self, city: &str, date: DateTime<Utc>) -> Result<HistoryWeather> {
+        let timestamp = date.timestamp();
+        let addr = self.format_addr_history(&format!(
+            "history/city?q={city}&type=hour&start={timestamp}&cnt=1"
+        ));
         let response = self.client.get(&addr).send().await?.error_for_status()?;
         Ok(response.json().await?)
     }
@@ -36,6 +45,10 @@ impl OpenWeather {
     }
 }
 
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct HistoryWeather {
+    pub list: Vec<CurrentWeather>,
+}
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CurrentWeather {
