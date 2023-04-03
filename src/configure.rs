@@ -7,7 +7,7 @@ pub async fn configure(provider: &Provider, config_file: &Path) -> Result<()> {
         Provider::OpenWeather => {
             openweather(config_file)?;
         }
-        Provider::WeatherApi => todo!(),
+        Provider::WeatherApi => weatherapi(config_file)?,
     }
     println!("Key saved successfully.");
 
@@ -19,6 +19,15 @@ fn openweather(config_file: &Path) -> Result<()> {
         .without_confirmation()
         .prompt()?;
     let serialized = serde_json::to_string(&ProviderUserInfo::OpenWeather { api_key: key })?;
+    std::fs::write(config_file, serialized)?;
+    Ok(())
+}
+
+fn weatherapi(config_file: &Path) -> Result<()> {
+    let key = inquire::Password::new("Weather API api key:")
+        .without_confirmation()
+        .prompt()?;
+    let serialized = serde_json::to_string(&ProviderUserInfo::WeatherApi { api_key: key })?;
     std::fs::write(config_file, serialized)?;
     Ok(())
 }
