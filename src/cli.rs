@@ -1,4 +1,4 @@
-use chrono::{NaiveDateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use clap::{command, Parser, Subcommand, ValueEnum};
 
 use crate::error;
@@ -41,14 +41,20 @@ fn parse_date(arg: &str) -> error::Result<DateVariant> {
     Ok(variant)
 }
 
+/// Enum representing weather service providers.
 #[derive(Clone, Copy, ValueEnum)]
 pub enum Provider {
+    /// OpenWeather provider.
     OpenWeather,
+    /// WeatherAPI provider.
     WeatherApi,
 }
 
+/// Enum representing either the current date or a historical date.
 #[derive(Clone, Copy)]
 pub enum DateVariant {
+    /// The current date.
     Now,
-    HistoryDate(chrono::DateTime<Utc>),
+    /// A specific historical date.
+    HistoryDate(DateTime<Utc>),
 }

@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+/// Enum representing errors that may occur during the weather CLI's execution.
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("request error")]

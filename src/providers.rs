@@ -12,10 +12,20 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
+/// An enum representing user information required by weather providers.
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ProviderUserInfo {
-    OpenWeather { api_key: String },
-    WeatherApi { api_key: String },
+    /// User information required by the OpenWeather provider.
+    OpenWeather {
+        /// The API key required by the OpenWeather provider.
+        api_key: String,
+    },
+
+    /// User information required by the WeatherApi provider.
+    WeatherApi {
+        /// The API key required by the WeatherApi provider.
+        api_key: String,
+    },
 }
 
 impl ProviderUserInfo {
@@ -31,9 +41,30 @@ impl ProviderUserInfo {
     }
 }
 
+/// A trait for weather providers that can provide current and historical weather data.
 #[async_trait]
 pub trait WeatherProvider {
+    /// Retrieves the current weather data for the specified city.
+    ///
+    /// # Arguments
+    ///
+    /// * `city` - A string representing the name of the city for which to retrieve weather data.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the `Weather` data for the specified city, or an error if the data could not be retrieved.
     async fn get_weather_city(&self, city: &str) -> Result<Weather>;
+
+    /// Retrieves the historical weather data for the specified city and date.
+    ///
+    /// # Arguments
+    ///
+    /// * `city` - A string representing the name of the city for which to retrieve weather data.
+    /// * `date` - A `DateTime<Utc>` representing the date for which to retrieve weather data.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the `Weather` data for the specified city and date, or an error if the data could not be retrieved.
     async fn get_history_weather_city(&self, city: &str, date: DateTime<Utc>) -> Result<Weather>;
 }
 
@@ -127,22 +158,39 @@ fn openweather_extract_weather_data(w: CurrentWeather) -> Weather {
     }
 }
 
+/// A struct representing weather information.
 #[derive(Debug)]
 pub struct Weather {
+    /// The percentage of sky covered by clouds.
     pub cloudiness: i64,
+
+    /// A short description of the weather condition, e.g. "Sunny", "Partly Cloudy".
     pub description: String,
+
+    /// The temperature in degrees Celsius.
     pub temperature: f64,
+
+    /// The wind speed and direction.
     pub wind: Wind,
+
+    /// The volume of rain in millimeters.
     pub rain_volume: f64,
 
-    /// Visibility in meters
+    /// The visibility in meters.
     pub visibility: i64,
+
+    /// The name of the location for which the weather information pertains.
     pub location: String,
 }
 
+/// A struct representing wind information.
 #[derive(Debug)]
 pub struct Wind {
-    /// Wind speed in m/s
+    /// The wind speed in meters per second.
     pub speed: f64,
+
+    /// The direction that the wind is coming from, in degrees.
+    ///
+    /// A value of 0 degrees indicates a northerly wind, while a value of 180 degrees indicates a southerly wind.
     pub deg: i64,
 }
